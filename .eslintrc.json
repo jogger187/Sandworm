@@ -1,13 +1,16 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "node": true
     },
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
-        "prettier"
+        "plugin:prettier/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -15,27 +18,53 @@
             "jsx": true
         },
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
     "plugins": [
         "react",
         "react-hooks",
         "@typescript-eslint",
-        "prettier"
+        "prettier",
+        "deprecation",
+        "import"
     ],
     "rules": {
-        "react/react-in-jsx-scope": "off",
-        "camelcase": "error",
-        "spaced-comment": "error",
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "no-duplicate-imports": "error"
+      "indent": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "trailingComma": "all",
+        "printWidth": 120
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "import/order": ["error", {
+      "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object"],
+      "pathGroups": [
+        {
+          "pattern": "@/**",
+          "group": "internal"
+        }
+      ],
+      "newlines-between": "always"
+    }],
+    "import/no-duplicates": "off",
+    "deprecation/deprecation": "warn",
+    "@typescript-eslint/no-explicit-any": "off"
     },
     "settings": {
-        "import/resolver": {
-            "typescript": {}
+      "import/resolver": {
+        "node": {
+          "extensions": [".js", ".jsx", ".ts", ".tsx"]
         }
+      }
     }
 }
