@@ -6,10 +6,26 @@ export const Container = styled.div`
   justify-content: space-evenly;
   align-items: center;
   color: white;
-  background-color: #139a22;
+  background-color: rgb(31, 36, 40);
 `
 
 export const GamePanel = styled.div`
+  display: grid;
+  padding: 1px;
+  grid-template-rows: repeat(30, 1rem);
+  grid-template-columns: repeat(30, 1rem);
+  gap: 2px;
+  background-color: #000000;
+`
+
+export const Block = styled.div`
+  width: 10px;
+  height: 10px;
+  background-color: #432245;
+`
+
+export const UserPanel = styled.div`
   display: flex;
-  background-color: #132a92;
+  flex-direction: column;
+  background-color: #946952;
 `
