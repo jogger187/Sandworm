@@ -7,12 +7,21 @@ import Block from '../block/block'
 import { Container, GamePanel, UserPanel } from './styles'
 import { BlockProp } from './types'
 
+enum ArrowType {
+  ArrowUp = 'ArrowUp',
+  ArrowDown = 'ArrowDown',
+  ArrowLeft = 'ArrowLeft',
+  ArrowRight = 'ArrowRight',
+}
+
 const Playground: FC = () => {
   const [headX, setHeadX] = useState(15)
   const [headY, setHeadY] = useState(-15)
   const preHeadX = useRef(15)
   const preHeadY = useRef(-15)
   const [gameStatus, setGameStatus] = useState<boolean | undefined>(undefined)
+
+  const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight)
 
   const [blockStatus, setBlockStatus] = useState<BlockProp[]>([])
 
@@ -31,7 +40,7 @@ const Playground: FC = () => {
   const handleGO = () => {
     preHeadX.current = headX
     preHeadY.current = headY
-    setHeadX(headX + 1)
+    setHeadX((prevState) => prevState + 1)
   }
 
   const changeGameStatus = () => {
@@ -73,14 +82,71 @@ const Playground: FC = () => {
     setBlockStatus(blockStatusArray)
   }
 
+  function getArrowNow(arrow: string) {
+    switch (arrow) {
+      case ArrowType.ArrowDown:
+        setUserArrow(ArrowType.ArrowDown)
+        break
+      case ArrowType.ArrowUp:
+        setUserArrow(ArrowType.ArrowUp)
+        break
+      case ArrowType.ArrowLeft:
+        setUserArrow(ArrowType.ArrowLeft)
+        break
+      case ArrowType.ArrowRight:
+        setUserArrow(ArrowType.ArrowRight)
+        break
+    }
+  }
+
+  function moveForwardByArrowType(arrow: ArrowType) {
+    switch (arrow) {
+      case ArrowType.ArrowDown:
+        console.log('>> ArrowDown')
+        setHeadY((prevState) => prevState - 1)
+        break
+      case ArrowType.ArrowUp:
+        console.log('>> ArrowUp')
+        setHeadY((prevState) => prevState + 1)
+        break
+      case ArrowType.ArrowLeft:
+        console.log('>> ArrowLeft')
+        setHeadX((prevState) => prevState - 1)
+        break
+      case ArrowType.ArrowRight:
+        console.log('>> ArrowRight')
+        setHeadX((prevState) => prevState + 1)
+        break
+    }
+  }
+
   useEffect(() => {
     if (gameStatus !== undefined) {
       handleMoving()
     }
   }, [headX, headY])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log(`gameStatus = ${gameStatus} `)
+      if (gameStatus === true) {
+        moveForwardByArrowType(userArrow)
+      }
+    }, 200)
+
+    if (gameStatus !== true) {
+      clearInterval(interval)
+    }
+
+    return () => clearInterval(interval)
+  }, [gameStatus, userArrow])
+
   return (
-    <Container>
+    <Container
+      onKeyDown={(e) => {
+        getArrowNow(e.code)
+      }}
+    >
       <GamePanel>
         {blockStatus.map((item) => {
           return <Block key={item.id} blocktype={item.status}></Block>
