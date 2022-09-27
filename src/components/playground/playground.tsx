@@ -7,12 +7,24 @@ import Block from '../block/block'
 import { Container, GamePanel, UserPanel } from './styles'
 import { BlockProp } from './types'
 
+enum ArrowType {
+  ArrowUp = 'ArrowUp',
+  ArrowDown = 'ArrowDown',
+  ArrowLeft = 'ArrowLeft',
+  ArrowRight = 'ArrowRight',
+}
+
 const Playground: FC = () => {
   const [headX, setHeadX] = useState(15)
   const [headY, setHeadY] = useState(-15)
   const preHeadX = useRef(15)
   const preHeadY = useRef(-15)
   const [gameStatus, setGameStatus] = useState<boolean | undefined>(undefined)
+
+  const bodyLinkList = useRef()
+
+  const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight)
+  const preUserArrow = useRef<ArrowType>(ArrowType.ArrowRight)
 
   const [blockStatus, setBlockStatus] = useState<BlockProp[]>([])
 
@@ -31,22 +43,30 @@ const Playground: FC = () => {
   const handleGO = () => {
     preHeadX.current = headX
     preHeadY.current = headY
-    setHeadX(headX + 1)
+    setHeadX((prevState) => prevState + 1)
   }
 
   const changeGameStatus = () => {
     setGameStatus(!gameStatus)
   }
 
-  const handleMoving = () => {
-    const blockStatusArray: BlockProp[] = Object.assign([], blockStatus)
-    // const { status, id, x, y } = blockStatusArray[getIndexByXY(headX, headY)]
+  const handleRestart = () => {
+    iniStatus()
+    setHeadX(15)
+    setHeadY(-15)
+  }
 
-    blockStatusArray[getIndexByXY(preHeadX.current, preHeadY.current)] = {
-      status: 0,
-      id: `(${preHeadX.current},${preHeadY.current})`,
-      x: preHeadX.current,
-      y: preHeadY.current,
+  const handleMoving = () => {
+    const blockStatusArray: BlockProp[] = []
+    for (let j = 0; j > -30; j--) {
+      for (let k = 0; k < 30; k++) {
+        blockStatusArray.push({
+          status: 0,
+          id: `(${j},${k})`,
+          x: j,
+          y: k,
+        })
+      }
     }
 
     blockStatusArray[getIndexByXY(headX, headY)] = {
@@ -73,14 +93,94 @@ const Playground: FC = () => {
     setBlockStatus(blockStatusArray)
   }
 
+  function getArrowNow(arrow: string) {
+    switch (arrow) {
+      case ArrowType.ArrowDown:
+        if (preUserArrow.current === ArrowType.ArrowUp) {
+          // error arrow
+        } else {
+          preUserArrow.current = ArrowType.ArrowDown
+          setUserArrow(ArrowType.ArrowDown)
+        }
+        break
+      case ArrowType.ArrowUp:
+        if (preUserArrow.current === ArrowType.ArrowDown) {
+          // error arrow
+        } else {
+          preUserArrow.current = ArrowType.ArrowUp
+          setUserArrow(ArrowType.ArrowUp)
+        }
+        break
+      case ArrowType.ArrowLeft:
+        if (preUserArrow.current === ArrowType.ArrowRight) {
+          // error arrow
+        } else {
+          preUserArrow.current = ArrowType.ArrowLeft
+          setUserArrow(ArrowType.ArrowLeft)
+        }
+
+        break
+      case ArrowType.ArrowRight:
+        if (preUserArrow.current === ArrowType.ArrowLeft) {
+          // error arrow
+        } else {
+          preUserArrow.current = ArrowType.ArrowRight
+          setUserArrow(ArrowType.ArrowRight)
+        }
+        break
+    }
+  }
+
+  function moveForwardByArrowType(arrow: ArrowType) {
+    switch (arrow) {
+      case ArrowType.ArrowDown:
+        console.log('>> ArrowDown')
+        setHeadY((prevState) => prevState - 1)
+        break
+      case ArrowType.ArrowUp:
+        console.log('>> ArrowUp')
+        setHeadY((prevState) => prevState + 1)
+        break
+      case ArrowType.ArrowLeft:
+        console.log('>> ArrowLeft')
+        setHeadX((prevState) => prevState - 1)
+        break
+      case ArrowType.ArrowRight:
+        console.log('>> ArrowRight')
+        setHeadX((prevState) => prevState + 1)
+        break
+    }
+  }
+
   useEffect(() => {
-    if (gameStatus !== undefined) {
+    if (headX > 29 || headX < 0 || headY > 0 || headY < -29) {
+      alert('Game Over !!!')
+    } else if (gameStatus !== undefined) {
       handleMoving()
     }
   }, [headX, headY])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log(`gameStatus = ${gameStatus} `)
+      if (gameStatus === true) {
+        moveForwardByArrowType(userArrow)
+      }
+    }, 200)
+
+    if (gameStatus !== true) {
+      clearInterval(interval)
+    }
+
+    return () => clearInterval(interval)
+  }, [gameStatus, userArrow])
+
   return (
-    <Container>
+    <Container
+      onKeyDown={(e) => {
+        getArrowNow(e.code)
+      }}
+    >
       <GamePanel>
         {blockStatus.map((item) => {
           return <Block key={item.id} blocktype={item.status}></Block>
@@ -107,7 +207,7 @@ const Playground: FC = () => {
         <Button
           variant='text'
           onClick={() => {
-            iniStatus()
+            handleRestart()
           }}
         >
           重新開始
