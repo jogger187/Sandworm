@@ -19,12 +19,15 @@ const Playground: FC = () => {
   const [headY, setHeadY] = useState(-15)
   const preHeadX = useRef(15)
   const preHeadY = useRef(-15)
-  const [gameStatus, setGameStatus] = useState<boolean | undefined>(undefined)
+  const [gameStatus, setGameStatus] = useState<boolean | undefined>(false)
 
   const [pointsAddress, setPointsAddress] = useState(0)
   const [score, setScore] = useState(0)
+  const [timer, setTimer] = useState(0)
 
   const bodyLinkList = useRef()
+
+  const [body, setBody] = useState<number[]>([])
 
   const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight)
   const preUserArrow = useRef<ArrowType>(ArrowType.ArrowRight)
@@ -75,6 +78,7 @@ const Playground: FC = () => {
 
   const handleMoving = () => {
     const blockStatusArray: BlockProp[] = []
+
     for (let j = 0; j > -30; j--) {
       for (let k = 0; k < 30; k++) {
         blockStatusArray.push({
@@ -100,6 +104,16 @@ const Playground: FC = () => {
       x: headX,
       y: headY,
     }
+
+    body.map((item) => {
+      const { id, x, y } = blockStatusArray[item]
+      blockStatusArray[item] = {
+        status: 3,
+        id: id,
+        x: x,
+        y: y,
+      }
+    })
     setBlockStatus(blockStatusArray)
   }
 
@@ -156,26 +170,54 @@ const Playground: FC = () => {
     }
   }
 
+  function handleBodyMoving() {
+    const temp = [...body]
+    if (temp.length > 0) {
+      temp.pop()
+      temp.unshift(getIndexByXY(preHeadX.current, preHeadY.current))
+      setBody(temp)
+    }
+  }
+
   function moveForwardByArrowType(arrow: ArrowType) {
     switch (arrow) {
       case ArrowType.ArrowDown:
-        console.log('>> ArrowDown')
-        setHeadY((prevState) => prevState - 1)
+        // console.log('>> ArrowDown')
+        setHeadY((prevState) => {
+          return prevState - 1
+        })
         break
       case ArrowType.ArrowUp:
-        console.log('>> ArrowUp')
-        setHeadY((prevState) => prevState + 1)
+        // console.log('>> ArrowUp')
+        setHeadY((prevState) => {
+          return prevState + 1
+        })
         break
       case ArrowType.ArrowLeft:
-        console.log('>> ArrowLeft')
-        setHeadX((prevState) => prevState - 1)
+        // console.log('>> ArrowLeft')
+        setHeadX((prevState) => {
+          return prevState - 1
+        })
         break
       case ArrowType.ArrowRight:
-        console.log('>> ArrowRight')
-        setHeadX((prevState) => prevState + 1)
+        // console.log('>> ArrowRight')
+        setHeadX((prevState) => {
+          return prevState + 1
+        })
         break
     }
   }
+
+  function strengthening() {
+    //
+    const temp = [...body]
+    temp.unshift(getIndexByXY(headX, headY))
+    setBody(temp)
+  }
+
+  useEffect(() => {
+    console.log(body)
+  }, [body])
 
   useEffect(() => {
     // Generate a point address
@@ -183,21 +225,34 @@ const Playground: FC = () => {
   }, [])
 
   useEffect(() => {
-    if (headX > 29 || headX < 0 || headY > 0 || headY < -29) {
-      alert('Game Over !!!')
-    } else if (getIndexByXY(headX, headY) === pointsAddress) {
-      handleGeneratePoint()
-      setScore((prevState) => prevState + 1)
-    } else if (gameStatus !== undefined) {
+    if (gameStatus === true) {
+      console.log(`old = (${preHeadX.current}, ${preHeadY.current}), new = (${headX}, ${headY})`)
+      if (headX > 29 || headX < 0 || headY > 0 || headY < -29) {
+        alert('Game Over !!!')
+      } else if (getIndexByXY(headX, headY) === pointsAddress) {
+        handleGeneratePoint()
+        setScore((prevState) => prevState + 1)
+        strengthening()
+      } else if (gameStatus !== undefined) {
+        handleBodyMoving()
+      }
       handleMoving()
     }
   }, [headX, headY])
 
   useEffect(() => {
+    if (gameStatus === true) {
+      preHeadX.current = headX
+      preHeadY.current = headY
+      moveForwardByArrowType(userArrow)
+    }
+    console.log(body.length)
+  }, [timer])
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      console.log(`gameStatus = ${gameStatus} `)
       if (gameStatus === true) {
-        moveForwardByArrowType(userArrow)
+        setTimer((timer) => timer + 1)
       }
     }, 200)
 
@@ -206,7 +261,7 @@ const Playground: FC = () => {
     }
 
     return () => clearInterval(interval)
-  }, [gameStatus, userArrow])
+  }, [gameStatus])
 
   return (
     <Container
@@ -228,23 +283,27 @@ const Playground: FC = () => {
         >
           Moving
         </Button>
-        <Button
-          variant='text'
-          onClick={() => {
-            iniStatus()
-            changeGameStatus()
-          }}
-        >
-          {gameStatus === true ? '暫停' : '開始'}
-        </Button>
-        <Button
-          variant='text'
-          onClick={() => {
-            handleRestart()
-          }}
-        >
-          重新開始
-        </Button>
+        {gameStatus !== undefined && (
+          <Button
+            variant='text'
+            onClick={() => {
+              iniStatus()
+              changeGameStatus()
+            }}
+          >
+            {gameStatus === true ? 'STOP' : 'START'}
+          </Button>
+        )}
+        {gameStatus === undefined && (
+          <Button
+            variant='text'
+            onClick={() => {
+              handleRestart()
+            }}
+          >
+            RESTART
+          </Button>
+        )}
       </UserPanel>
     </Container>
   )
