@@ -21,6 +21,9 @@ const Playground: FC = () => {
   const preHeadY = useRef(-15)
   const [gameStatus, setGameStatus] = useState<boolean | undefined>(undefined)
 
+  const [pointsAddress, setPointsAddress] = useState(0)
+  const [score, setScore] = useState(0)
+
   const bodyLinkList = useRef()
 
   const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight)
@@ -29,15 +32,29 @@ const Playground: FC = () => {
   const [blockStatus, setBlockStatus] = useState<BlockProp[]>([])
 
   const handleGeneratePoint = () => {
-    const blockStatusArray = [...blockStatus]
-    const { status, id, x, y } = blockStatusArray[0]
-    blockStatusArray[0] = {
-      status: 1,
-      id: id,
-      x: x,
-      y: y,
+    let tempAddress = generateRandom()
+
+    // add condition for new point address
+    while (pointsAddress === tempAddress) {
+      tempAddress = generateRandom()
     }
-    setBlockStatus(blockStatusArray)
+    setPointsAddress(tempAddress)
+  }
+
+  function generateRandom(min = 0, max = 899) {
+    // find diff
+    const difference = max - min
+
+    // generate random number
+    let rand = Math.random()
+
+    // multiply with difference
+    rand = Math.floor(rand * difference)
+
+    // add with min value
+    rand = rand + min
+
+    return rand
   }
 
   const handleGO = () => {
@@ -67,6 +84,14 @@ const Playground: FC = () => {
           y: k,
         })
       }
+    }
+
+    const { id, x, y } = blockStatusArray[pointsAddress]
+    blockStatusArray[pointsAddress] = {
+      status: 1,
+      id: id,
+      x: x,
+      y: y,
     }
 
     blockStatusArray[getIndexByXY(headX, headY)] = {
@@ -153,8 +178,16 @@ const Playground: FC = () => {
   }
 
   useEffect(() => {
+    // Generate a point address
+    handleGeneratePoint()
+  }, [])
+
+  useEffect(() => {
     if (headX > 29 || headX < 0 || headY > 0 || headY < -29) {
       alert('Game Over !!!')
+    } else if (getIndexByXY(headX, headY) === pointsAddress) {
+      handleGeneratePoint()
+      setScore((prevState) => prevState + 1)
     } else if (gameStatus !== undefined) {
       handleMoving()
     }
