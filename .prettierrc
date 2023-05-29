@@ -4,7 +4,7 @@
         "es2021": true,
         "jest": true
     },
-    "semi": false,
+    "semi": true,
     "tabWidth": 2,
     "printWidth": 100,
     "singleQuote": true,
