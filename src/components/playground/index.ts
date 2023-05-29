@@ -1,3 +1,3 @@
-export * from './playground'
-export * from './styles'
-export * from './types'
+export * from './playground';
+export * from './styles';
+export * from './types';

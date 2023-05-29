@@ -1,2 +1,2 @@
-export * from './block'
-export * from './styles'
+export * from './block';
+export * from './styles';

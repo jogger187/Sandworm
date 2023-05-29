@@ -1,1 +1,1 @@
-export * from './moving'
+export * from './moving';

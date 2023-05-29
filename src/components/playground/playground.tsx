@@ -1,11 +1,11 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
-import { Button } from '@mui/material'
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { Button } from '@mui/material';
 
-import { getIndexByXY } from '../../utility'
-import Block from '../block/block'
+import { getIndexByXY } from '../../utility';
+import Block from '../block/block';
 
-import { Container, GamePanel, UserPanel } from './styles'
-import { BlockProp } from './types'
+import { Container, GamePanel, UserPanel } from './styles';
+import { BlockProp } from './types';
 
 enum ArrowType {
   ArrowUp = 'ArrowUp',
@@ -15,69 +15,69 @@ enum ArrowType {
 }
 
 const Playground: FC = () => {
-  const [headX, setHeadX] = useState(15)
-  const [headY, setHeadY] = useState(-15)
-  const preHeadX = useRef(15)
-  const preHeadY = useRef(-15)
-  const [gameStatus, setGameStatus] = useState<boolean | undefined>(false)
+  const [headX, setHeadX] = useState(15);
+  const [headY, setHeadY] = useState(-15);
+  const preHeadX = useRef(15);
+  const preHeadY = useRef(-15);
+  const [gameStatus, setGameStatus] = useState<boolean | undefined>(false);
 
-  const [pointsAddress, setPointsAddress] = useState(0)
-  const [score, setScore] = useState(0)
-  const [timer, setTimer] = useState(0)
+  const [pointsAddress, setPointsAddress] = useState(0);
+  const [score, setScore] = useState(0);
+  const [timer, setTimer] = useState(0);
 
-  const bodyLinkList = useRef()
+  const bodyLinkList = useRef();
 
-  const [body, setBody] = useState<number[]>([])
+  const [body, setBody] = useState<number[]>([]);
 
-  const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight)
-  const preUserArrow = useRef<ArrowType>(ArrowType.ArrowRight)
+  const [userArrow, setUserArrow] = useState<ArrowType>(ArrowType.ArrowRight);
+  const preUserArrow = useRef<ArrowType>(ArrowType.ArrowRight);
 
-  const [blockStatus, setBlockStatus] = useState<BlockProp[]>([])
+  const [blockStatus, setBlockStatus] = useState<BlockProp[]>([]);
 
   const handleGeneratePoint = () => {
-    let tempAddress = generateRandom()
+    let tempAddress = generateRandom();
 
     // add condition for new point address
     while (pointsAddress === tempAddress) {
-      tempAddress = generateRandom()
+      tempAddress = generateRandom();
     }
-    setPointsAddress(tempAddress)
-  }
+    setPointsAddress(tempAddress);
+  };
 
   function generateRandom(min = 0, max = 899) {
     // find diff
-    const difference = max - min
+    const difference = max - min;
 
     // generate random number
-    let rand = Math.random()
+    let rand = Math.random();
 
     // multiply with difference
-    rand = Math.floor(rand * difference)
+    rand = Math.floor(rand * difference);
 
     // add with min value
-    rand = rand + min
+    rand = rand + min;
 
-    return rand
+    return rand;
   }
 
   const handleGO = () => {
-    preHeadX.current = headX
-    preHeadY.current = headY
-    setHeadX((prevState) => prevState + 1)
-  }
+    preHeadX.current = headX;
+    preHeadY.current = headY;
+    setHeadX((prevState) => prevState + 1);
+  };
 
   const changeGameStatus = () => {
-    setGameStatus(!gameStatus)
-  }
+    setGameStatus(!gameStatus);
+  };
 
   const handleRestart = () => {
-    iniStatus()
-    setHeadX(15)
-    setHeadY(-15)
-  }
+    iniStatus();
+    setHeadX(15);
+    setHeadY(-15);
+  };
 
   const handleMoving = () => {
-    const blockStatusArray: BlockProp[] = []
+    const blockStatusArray: BlockProp[] = [];
 
     for (let j = 0; j > -30; j--) {
       for (let k = 0; k < 30; k++) {
@@ -86,39 +86,39 @@ const Playground: FC = () => {
           id: `(${j},${k})`,
           x: j,
           y: k,
-        })
+        });
       }
     }
 
-    const { id, x, y } = blockStatusArray[pointsAddress]
+    const { id, x, y } = blockStatusArray[pointsAddress];
     blockStatusArray[pointsAddress] = {
       status: 1,
       id: id,
       x: x,
       y: y,
-    }
+    };
 
     blockStatusArray[getIndexByXY(headX, headY)] = {
       status: 3,
       id: `(${headX},${headY})`,
       x: headX,
       y: headY,
-    }
+    };
 
     body.map((item) => {
-      const { id, x, y } = blockStatusArray[item]
+      const { id, x, y } = blockStatusArray[item];
       blockStatusArray[item] = {
         status: 3,
         id: id,
         x: x,
         y: y,
-      }
-    })
-    setBlockStatus(blockStatusArray)
-  }
+      };
+    });
+    setBlockStatus(blockStatusArray);
+  };
 
   function iniStatus() {
-    const blockStatusArray: BlockProp[] = []
+    const blockStatusArray: BlockProp[] = [];
     for (let j = 0; j > -30; j--) {
       for (let k = 0; k < 30; k++) {
         blockStatusArray.push({
@@ -126,10 +126,10 @@ const Playground: FC = () => {
           id: `(${j},${k})`,
           x: j,
           y: k,
-        })
+        });
       }
     }
-    setBlockStatus(blockStatusArray)
+    setBlockStatus(blockStatusArray);
   }
 
   function getArrowNow(arrow: string) {
@@ -138,44 +138,44 @@ const Playground: FC = () => {
         if (preUserArrow.current === ArrowType.ArrowUp) {
           // error arrow
         } else {
-          preUserArrow.current = ArrowType.ArrowDown
-          setUserArrow(ArrowType.ArrowDown)
+          preUserArrow.current = ArrowType.ArrowDown;
+          setUserArrow(ArrowType.ArrowDown);
         }
-        break
+        break;
       case ArrowType.ArrowUp:
         if (preUserArrow.current === ArrowType.ArrowDown) {
           // error arrow
         } else {
-          preUserArrow.current = ArrowType.ArrowUp
-          setUserArrow(ArrowType.ArrowUp)
+          preUserArrow.current = ArrowType.ArrowUp;
+          setUserArrow(ArrowType.ArrowUp);
         }
-        break
+        break;
       case ArrowType.ArrowLeft:
         if (preUserArrow.current === ArrowType.ArrowRight) {
           // error arrow
         } else {
-          preUserArrow.current = ArrowType.ArrowLeft
-          setUserArrow(ArrowType.ArrowLeft)
+          preUserArrow.current = ArrowType.ArrowLeft;
+          setUserArrow(ArrowType.ArrowLeft);
         }
 
-        break
+        break;
       case ArrowType.ArrowRight:
         if (preUserArrow.current === ArrowType.ArrowLeft) {
           // error arrow
         } else {
-          preUserArrow.current = ArrowType.ArrowRight
-          setUserArrow(ArrowType.ArrowRight)
+          preUserArrow.current = ArrowType.ArrowRight;
+          setUserArrow(ArrowType.ArrowRight);
         }
-        break
+        break;
     }
   }
 
   function handleBodyMoving() {
-    const temp = [...body]
+    const temp = [...body];
     if (temp.length > 0) {
-      temp.pop()
-      temp.unshift(getIndexByXY(preHeadX.current, preHeadY.current))
-      setBody(temp)
+      temp.pop();
+      temp.unshift(getIndexByXY(preHeadX.current, preHeadY.current));
+      setBody(temp);
     }
   }
 
@@ -184,101 +184,101 @@ const Playground: FC = () => {
       case ArrowType.ArrowDown:
         // console.log('>> ArrowDown')
         setHeadY((prevState) => {
-          return prevState - 1
-        })
-        break
+          return prevState - 1;
+        });
+        break;
       case ArrowType.ArrowUp:
         // console.log('>> ArrowUp')
         setHeadY((prevState) => {
-          return prevState + 1
-        })
-        break
+          return prevState + 1;
+        });
+        break;
       case ArrowType.ArrowLeft:
         // console.log('>> ArrowLeft')
         setHeadX((prevState) => {
-          return prevState - 1
-        })
-        break
+          return prevState - 1;
+        });
+        break;
       case ArrowType.ArrowRight:
         // console.log('>> ArrowRight')
         setHeadX((prevState) => {
-          return prevState + 1
-        })
-        break
+          return prevState + 1;
+        });
+        break;
     }
   }
 
   function strengthening() {
     //
-    const temp = [...body]
-    temp.unshift(getIndexByXY(headX, headY))
-    setBody(temp)
+    const temp = [...body];
+    temp.unshift(getIndexByXY(headX, headY));
+    setBody(temp);
   }
 
   useEffect(() => {
-    console.log(body)
-  }, [body])
+    console.log(body);
+  }, [body]);
 
   useEffect(() => {
     // Generate a point address
-    handleGeneratePoint()
-  }, [])
+    handleGeneratePoint();
+  }, []);
 
   useEffect(() => {
     if (gameStatus === true) {
-      console.log(`old = (${preHeadX.current}, ${preHeadY.current}), new = (${headX}, ${headY})`)
+      console.log(`old = (${preHeadX.current}, ${preHeadY.current}), new = (${headX}, ${headY})`);
       if (headX > 29 || headX < 0 || headY > 0 || headY < -29) {
-        alert('Game Over !!!')
+        alert('Game Over !!!');
       } else if (getIndexByXY(headX, headY) === pointsAddress) {
-        handleGeneratePoint()
-        setScore((prevState) => prevState + 1)
-        strengthening()
+        handleGeneratePoint();
+        setScore((prevState) => prevState + 1);
+        strengthening();
       } else if (gameStatus !== undefined) {
-        handleBodyMoving()
+        handleBodyMoving();
       }
-      handleMoving()
+      handleMoving();
     }
-  }, [headX, headY])
+  }, [headX, headY]);
 
   useEffect(() => {
     if (gameStatus === true) {
-      preHeadX.current = headX
-      preHeadY.current = headY
-      moveForwardByArrowType(userArrow)
+      preHeadX.current = headX;
+      preHeadY.current = headY;
+      moveForwardByArrowType(userArrow);
     }
-    console.log(body.length)
-  }, [timer])
+    console.log(body.length);
+  }, [timer]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (gameStatus === true) {
-        setTimer((timer) => timer + 1)
+        setTimer((timer) => timer + 1);
       }
-    }, 200)
+    }, 200);
 
     if (gameStatus !== true) {
-      clearInterval(interval)
+      clearInterval(interval);
     }
 
-    return () => clearInterval(interval)
-  }, [gameStatus])
+    return () => clearInterval(interval);
+  }, [gameStatus]);
 
   return (
     <Container
       onKeyDown={(e) => {
-        getArrowNow(e.code)
+        getArrowNow(e.code);
       }}
     >
       <GamePanel>
         {blockStatus.map((item) => {
-          return <Block key={item.id} blocktype={item.status}></Block>
+          return <Block key={item.id} blocktype={item.status}></Block>;
         })}
       </GamePanel>
       <UserPanel>
         <Button
           variant='text'
           onClick={() => {
-            handleGO()
+            handleGO();
           }}
         >
           Moving
@@ -287,8 +287,8 @@ const Playground: FC = () => {
           <Button
             variant='text'
             onClick={() => {
-              iniStatus()
-              changeGameStatus()
+              iniStatus();
+              changeGameStatus();
             }}
           >
             {gameStatus === true ? 'STOP' : 'START'}
@@ -298,7 +298,7 @@ const Playground: FC = () => {
           <Button
             variant='text'
             onClick={() => {
-              handleRestart()
+              handleRestart();
             }}
           >
             RESTART
@@ -306,7 +306,7 @@ const Playground: FC = () => {
         )}
       </UserPanel>
     </Container>
-  )
-}
+  );
+};
 
-export default Playground
+export default Playground;
